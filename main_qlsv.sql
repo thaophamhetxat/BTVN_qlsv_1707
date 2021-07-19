@@ -42,3 +42,58 @@ from tblSinhvien
  inner join tblLop on tblSinhvien.sv_Lop = tblLop.l_ID
  inner join tblKhoa on tblLop.l_Khoa= tblKhoa.k_ID
  where k_Ten = 'cntt';
+
+
+
+
+/*Tên khoa, Họ tên, ngày sinh, điểm trung bình của sinh viên có điểm trung bình cao nhất khoa */
+SELECT tblSinhvien.sv_Maso, tblSinhvien.sv_Hodem,tblSinhvien.sv_Ten,tblSinhvien.sv_Lop,tblKhoa.k_Ten , AVG(sv_DiemTB)
+FROM tblSinhVien 
+inner join tblLop on tblSinhvien.sv_Lop = tblLop.l_ID
+ inner join tblKhoa on tblLop.l_Khoa= tblKhoa.k_ID
+HAVING AVG(sv_DiemTB) >= 8;
+
+/*Tên khoa, tên lớp, điểm trung bình của sinh viên (chú ý: liệt kê tất cả các khoa và lớp, kể cả khoa và lớp chưa có sinh viên)*/
+SELECT tblSinhvien.sv_Hodem,tblSinhvien.sv_Ten,tblLop.l_Ten,tblKhoa.k_Ten , AVG(sv_DiemTB)
+FROM tblSinhVien
+ join tblLop on tblSinhvien.sv_Lop = tblLop.l_ID
+ join tblKhoa on tblLop.l_Khoa= tblKhoa.k_ID
+ group by tblSinhvien.sv_Hodem,tblSinhvien.sv_Ten,tblLop.l_Ten,tblKhoa.k_Ten;
+ 
+ /*Tên khoa, tổng số sinh viên của khoa */
+select tblSinhvien.sv_Hodem,tblSinhvien.sv_Ten, count(sv_Maso) AS 'Số lượng học viên',tblKhoa.k_Ten
+FROM tblSinhVien
+ join tblLop on tblSinhvien.sv_Lop = tblLop.l_ID
+ join tblKhoa on tblLop.l_Khoa= tblKhoa.k_ID
+GROUP BY tblSinhvien.sv_Hodem,tblSinhvien.sv_Ten,tblKhoa.k_Ten;
+
+/* Tên lớp, tổng số sinh viên của lớp*/ 
+select tblSinhvien.sv_Hodem,tblSinhvien.sv_Ten, count(sv_Maso) AS 'Số lượng học viên',tblLop.l_Ten
+FROM tblSinhVien
+ join tblLop on tblSinhvien.sv_Lop = tblLop.l_ID
+ join tblKhoa on tblLop.l_Khoa= tblKhoa.k_ID
+GROUP BY tblSinhvien.sv_Hodem,tblSinhvien.sv_Ten,tblLop.l_Ten;
+
+/* Tên lớp, danh sách các sinh viên của lớp sắp xếp theo điểm trung bình giảm dần*/
+SELECT tblSinhvien.sv_Hodem,tblSinhvien.sv_Ten,tblLop.l_Ten,tblKhoa.k_Ten , AVG(sv_DiemTB)
+FROM tblSinhVien
+ join tblLop on tblSinhvien.sv_Lop = tblLop.l_ID
+ join tblKhoa on tblLop.l_Khoa= tblKhoa.k_ID
+  group by tblSinhvien.sv_Hodem,tblSinhvien.sv_Ten,tblLop.l_Ten,tblKhoa.k_Ten
+ ORDER BY  sv_DiemTB DESC ;
+ 
+ /*Số lượng sinh viên loại giỏi, loại khá, loại trung bình (trong cùng 1 query)*/
+SELECT 
+count(case when sv_DiemTB>=9 then 1 else null end) as 'gioi',
+count(case when sv_DiemTB<9 and sv_DiemTB>7 then 1 else null end) as 'kha',
+count(case when sv_DiemTB<=7 then 1 else null end) as 'trunh binh'
+from tblSinhvien;
+/* Số lượng sinh viên loại giỏi, khá, trung bình của từng lớp (trong cùng 1 query)*/
+SELECT l_Ten,
+sum (if (sv_DiemTB >= 9,1,0)) as 'gioi',
+sum (if (sv_DiemTB<9 and sv_DiemTB>7,1,0)) as 'kha',
+sum (if (sv_DiemTB <=7,1,0)) as 'trung binh'
+FROM tblSinhvien
+ join tblLop on tblSinhvien.sv_Lop = tblLop.l_ID;
+
+ 
